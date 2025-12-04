@@ -1,0 +1,180 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order Details - 2Why{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Order Details -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h1 class="display-4 fw-bold text-primary">Order #{{ order.id }}</h1>
+                <p class="lead text-muted">Order details and management</p>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- Order Info -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Order Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Order ID:</strong> #{{ order.id }}</p>
+                        <p><strong>Status:</strong>
+                            <span class="badge
+                                {% if order.status == 'Pending' %}bg-warning
+                                {% elseif order.status == 'Confirmed' %}bg-info
+                                {% elseif order.status == 'Shipped' %}bg-secondary
+                                {% elseif order.status == 'Delivered' %}bg-success
+                                {% elseif order.status == 'Cancelled' %}bg-danger
+                                {% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </p>
+                        <p><strong>Total:</strong> ${{ order.total }}</p>
+                        <p><strong>Date:</strong> {{ order.createdAt|date('Y-m-d H:i:s') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Customer Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Email:</strong> {{ order.user.email }}</p>
+                        <p><strong>User ID:</strong> {{ order.user.id }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Order Items</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Quantity</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in order.orderItems %}
+                                    <tr>
+                                        <td>{{ item.product.name }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td>${{ item.price }}</td>
+                                        <td>${{ (item.quantity * item.price)|number_format(2) }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">Update Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{{ path('admin_orders_update_status', {'id': order.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('update_status' ~ order.id) }}">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="Pending" {{ order.status == 'Pending' ? 'selected' : '' }}>Pending</option>
+                                    <option value="Confirmed" {{ order.status == 'Confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                    <option value="Shipped" {{ order.status == 'Shipped' ? 'selected' : '' }}>Shipped</option>
+                                    <option value="Delivered" {{ order.status == 'Delivered' ? 'selected' : '' }}>Delivered</option>
+                                    <option value="Cancelled" {{ order.status == 'Cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ path('admin_orders_invoice', {'id': order.id}) }}" class="btn btn-outline-primary" target="_blank">Download Invoice</a>
+                            <button type="button" class="btn btn-outline-info" data-bs-toggle="modal" data-bs-target="#contactModal">Contact Customer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <a href="{{ path('admin_orders') }}" class="btn btn-secondary">Back to Orders</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Customer Modal -->
+<div class="modal fade" id="contactModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contact Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{{ path('admin_orders_contact', {'id': order.id}) }}">
+                <div class="modal-body">
+                    <input type="hidden" name="_token" value="{{ csrf_token('contact' ~ order.id) }}">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message</label>
+                        <textarea class="form-control" id="message" name="message" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send Email</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

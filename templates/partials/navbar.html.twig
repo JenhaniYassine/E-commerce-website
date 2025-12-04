@@ -1,0 +1,277 @@
+{% block body %}
+<!-- Navigation -->
+<header role="banner">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top" role="navigation" aria-label="Main navigation">
+        <div class="container">
+            <a class="navbar-brand" href="{{ path('home') }}" aria-label="2Why - Home">
+                <span class="text-primary">2Why</span>
+            </a>
+
+            <!-- Slide Menu Toggle Button -->
+            <button class="slide-menu-toggle d-lg-none" type="button" aria-expanded="false" aria-label="Toggle main menu">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+
+            <!-- Desktop Navigation -->
+            <div class="d-none d-lg-flex navbar-nav me-auto" role="menubar">
+                <a class="nav-link {% if app.request.get('_route') == 'shop' %}active{% endif %}" href="{{ path('shop') }}" role="menuitem" aria-current="{% if app.request.get('_route') == 'shop' %}page{% endif %}">Shop</a>
+                {% if app.user %}
+                    <a class="nav-link {% if app.request.get('_route') == 'dashboard' %}active{% endif %}" href="{{ path('dashboard') }}" role="menuitem" aria-current="{% if app.request.get('_route') == 'dashboard' %}page{% endif %}">Dashboard</a>
+                    <a class="nav-link {% if app.request.get('_route') == 'faq' %}active{% endif %}" href="{{ path('faq') }}" role="menuitem" aria-current="{% if app.request.get('_route') == 'faq' %}page{% endif %}">FAQ</a>
+                    <a class="nav-link {% if app.request.get('_route') == 'contact' %}active{% endif %}" href="{{ path('contact') }}" role="menuitem" aria-current="{% if app.request.get('_route') == 'contact' %}page{% endif %}">Contact</a>
+                    {% if 'ROLE_ADMIN' in app.user.roles %}
+                        <a class="nav-link {% if app.request.get('_route') starts with 'admin_' %}active{% endif %}" href="{{ path('admin_dashboard') }}" role="menuitem" aria-current="{% if app.request.get('_route') starts with 'admin_' %}page{% endif %}">Admin</a>
+                        <div class="dropdown">
+                            <a class="nav-link dropdown-toggle {% if app.request.get('_route') starts with 'product_' %}active{% endif %}" href="#" id="productsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="Products menu">
+                                Products
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="productsDropdown" role="menu">
+                                <li><a class="dropdown-item" href="{{ path('admin_products') }}" role="menuitem">Manage Products</a></li>
+                                <li><a class="dropdown-item" href="{{ path('admin_products_new') }}" role="menuitem">Add Product</a></li>
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <a class="nav-link {% if app.request.get('_route') == 'contact' %}active{% endif %}" href="{{ path('contact') }}" role="menuitem" aria-current="{% if app.request.get('_route') == 'contact' %}page{% endif %}">Contact</a>
+                {% endif %}
+            </div>
+
+                <!-- Search Bar -->
+                <form class="d-flex me-3" role="search" action="{{ path('search') }}" method="get" aria-label="Search products">
+                    <div class="position-relative">
+                        <label for="search-input" class="visually-hidden">Search products</label>
+                        <input class="form-control me-2" type="search" name="q" id="search-input" placeholder="Search products..." aria-label="Search products" autocomplete="off" aria-describedby="search-help">
+                        <div id="autocomplete-results" class="position-absolute bg-white border rounded shadow-sm w-100" style="display: none; z-index: 1000; max-height: 200px; overflow-y: auto;" role="listbox" aria-label="Search suggestions"></div>
+                        <div id="search-help" class="visually-hidden">Type to search for products. Suggestions will appear below.</div>
+                    </div>
+                    <button class="btn btn-outline-primary" type="submit" aria-label="Submit search">
+                        <span aria-hidden="true">🔍</span>
+                        <span class="visually-hidden">Search</span>
+                    </button>
+                </form>
+
+                <!-- User Actions -->
+                <div class="d-flex align-items-center" role="toolbar" aria-label="User actions">
+                    <!-- Theme Switcher -->
+                    <button id="theme-switcher" class="me-3" type="button" aria-label="Toggle theme" title="Toggle between light and dark mode">
+                        <span class="fs-5" aria-hidden="true">🌙</span>
+                        <span class="visually-hidden">Toggle theme</span>
+                    </button>
+
+                    <a href="{{ path('cart_index') }}" class="text-decoration-none me-3 position-relative" aria-label="Shopping cart">
+                        <span class="fs-5" aria-hidden="true">🛒</span>
+                        <span class="badge bg-primary ms-1" id="cart-count" aria-label="Items in cart">0</span>
+                    </a>
+                    {% if app.user %}
+                        <div class="dropdown">
+                            <button class="btn btn-link text-decoration-none dropdown-toggle p-0" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true" aria-label="User menu for {{ app.user.firstName ?: app.user.email }}">
+                                <span class="fs-5 me-2" aria-hidden="true">👤</span>
+                                <span class="d-none d-lg-inline">{{ app.user.firstName ?: app.user.email }}</span>
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="userDropdown" role="menu">
+                                <li role="none"><a class="dropdown-item" href="{{ path('profile_index') }}" role="menuitem">My Profile</a></li>
+                                <li role="separator" class="dropdown-divider"></li>
+                                <li role="none"><a class="dropdown-item" href="{{ path('app_logout') }}" role="menuitem">Logout</a></li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" class="text-decoration-none" aria-label="Login to your account">
+                            <span class="fs-5 me-2" aria-hidden="true">👤</span>
+                            <span class="d-none d-lg-inline">Login</span>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<script>
+// Slide-in Menu Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.querySelector('.slide-menu-toggle');
+    const menuOverlay = document.getElementById('slideMenu');
+    const menuClose = document.querySelector('.slide-menu-close');
+    const body = document.body;
+
+    // Toggle menu
+    function toggleMenu() {
+        const isOpen = menuOverlay.classList.contains('open');
+        if (isOpen) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    }
+
+    // Open menu
+    function openMenu() {
+        menuOverlay.classList.add('open');
+        body.classList.add('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'true');
+        menuToggle.classList.add('active');
+
+        // Focus management
+        menuClose.focus();
+
+        // Prevent body scroll
+        body.style.overflow = 'hidden';
+    }
+
+    // Close menu
+    function closeMenu() {
+        menuOverlay.classList.remove('open');
+        body.classList.remove('menu-open');
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.classList.remove('active');
+
+        // Restore body scroll
+        body.style.overflow = '';
+
+        // Return focus to toggle button
+        menuToggle.focus();
+    }
+
+    // Event listeners
+    if (menuToggle) {
+        menuToggle.addEventListener('click', toggleMenu);
+    }
+    if (menuClose) {
+        menuClose.addEventListener('click', closeMenu);
+    }
+
+    // Close menu when clicking overlay
+    if (menuOverlay) {
+        menuOverlay.addEventListener('click', function(e) {
+            if (e.target === menuOverlay) {
+                closeMenu();
+            }
+        });
+    }
+
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && menuOverlay.classList.contains('open')) {
+            closeMenu();
+        }
+    });
+
+    // Update cart count
+    updateCartCount();
+
+    // Initialize search autocomplete
+    initSearchAutocomplete();
+
+    // Initialize theme switcher
+    initThemeSwitcher();
+});
+
+function initThemeSwitcher() {
+    const themeSwitcher = document.getElementById('theme-switcher');
+    console.log('Theme Switcher Element:', themeSwitcher);
+    
+    if (themeSwitcher) {
+        themeSwitcher.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            console.log('Current Theme:', currentTheme, 'New Theme:', newTheme);
+
+            // Apply theme
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update button icon
+            const iconSpan = this.querySelector('.fs-5');
+            if (iconSpan) {
+                iconSpan.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+                console.log('Icon updated to:', iconSpan.textContent);
+            }
+
+            // Announce theme change to screen readers
+            if (window.announceToScreenReader) {
+                window.announceToScreenReader(`Theme changed to ${newTheme} mode`);
+            }
+        });
+    } else {
+        console.error('Theme switcher button not found!');
+    }
+
+    // Load saved theme on page load
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    console.log('Saved Theme:', savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+
+    // Set initial icon
+    const iconSpan = themeSwitcher?.querySelector('.fs-5');
+    if (iconSpan) {
+        iconSpan.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        console.log('Initial icon set to:', iconSpan.textContent);
+    }
+}
+
+function updateCartCount() {
+    fetch('{{ path('cart_count') }}')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('cart-count').textContent = data.count;
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+function initSearchAutocomplete() {
+    const searchInput = document.getElementById('search-input');
+    const resultsDiv = document.getElementById('autocomplete-results');
+    let debounceTimer;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            resultsDiv.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(() => {
+            fetch('{{ path('search_autocomplete') }}?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    resultsDiv.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(item => {
+                            const div = document.createElement('div');
+                            div.className = 'p-2 border-bottom';
+                            div.style.cursor = 'pointer';
+                            div.innerHTML = '<strong>' + item.name + '</strong>';
+                            div.addEventListener('click', function() {
+                                window.location.href = item.url;
+                            });
+                            resultsDiv.appendChild(div);
+                        });
+                        resultsDiv.style.display = 'block';
+                    } else {
+                        resultsDiv.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching autocomplete:', error);
+                    resultsDiv.style.display = 'none';
+                });
+        }, 300);
+    });
+
+    // Hide results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+            resultsDiv.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}

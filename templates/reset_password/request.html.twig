@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reset your password{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div class="reset-password-bg">
+    <div class="particle-1"></div>
+    <div class="particle-2"></div>
+    <div class="particle-3"></div>
+</div>
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 p-3">
+    <div class="reset-password-card">
+        <div class="reset-password-logo">
+            <img src="{{ asset('image/logo.png') }}" alt="2Why Logo">
+            <h1>Reset Password</h1>
+        </div>
+
+        <div class="text-center mb-4">
+            <p class="text-white">
+                Enter your email address and we will send you a link to reset your password.
+            </p>
+        </div>
+
+        {% for flash_error in app.flashes('reset_password_error') %}
+            <div class="alert reset-password-alert" role="alert">{{ flash_error }}</div>
+        {% endfor %}
+
+        {{ form_start(requestForm, {'attr': {'class': 'reset-password-form'}}) }}
+            <div class="mb-3">
+                {{ form_label(requestForm.email, null, {'label_attr': {'class': 'form-label'}}) }}
+                {{ form_widget(requestForm.email, {'attr': {'class': 'form-control', 'placeholder': 'Enter your email'}}) }}
+                {{ form_errors(requestForm.email) }}
+            </div>
+
+            <div class="d-grid mb-3">
+                <button class="btn reset-password-btn" type="submit">
+                    Send password reset email
+                </button>
+            </div>
+        {{ form_end(requestForm) }}
+
+        <div class="text-center">
+            <a href="{{ path('app_login') }}" class="reset-password-link">← Back to login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Contact Header -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-4">Contact Us</h1>
+                <p class="lead mb-0">Get in touch with our team. We're here to help!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Content -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Info -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">Get in Touch</h4>
+
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <span class="fs-2">📍</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Address</h6>
+                                <p class="text-muted mb-0">123 Commerce Street<br>Business City, BC 12345</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <span class="fs-2">📞</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Phone</h6>
+                                <p class="text-muted mb-0">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <span class="fs-2">✉️</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Email</h6>
+                                <p class="text-muted mb-0">support@2why.com</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <span class="fs-2">🕒</span>
+                            </div>
+                            <div>
+                                <h6 class="mb-1">Business Hours</h6>
+                                <p class="text-muted mb-0">Mon-Fri: 9AM-6PM<br>Sat-Sun: 10AM-4PM</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h4 class="card-title mb-4">Send us a Message</h4>
+
+                        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(form.firstName, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.firstName, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                                    {{ form_errors(form.firstName) }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(form.lastName, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
+                                    {{ form_widget(form.lastName, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                                    {{ form_errors(form.lastName) }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.email, 'Email Address', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.email, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                                {{ form_errors(form.email) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.subject, 'Subject', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.subject, {'attr': {'class': 'form-control', 'required': 'required'}}) }}
+                                {{ form_errors(form.subject) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.message, 'Message', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.message, {'attr': {'class': 'form-control', 'rows': 5, 'required': 'required'}}) }}
+                                {{ form_errors(form.message) }}
+                            </div>
+
+                            <button type="submit" class="btn btn-primary btn-lg px-5">Send Message</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section (Placeholder) -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h3 class="mb-4">Find Us</h3>
+                <div class="ratio ratio-16x9">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.241264875!2d-73.98784868459375!3d40.75889597932781!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes+Square!5e0!3m2!1sen!2sus!4v1565731288764!5m2!1sen!2sus"
+                        allowfullscreen=""
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

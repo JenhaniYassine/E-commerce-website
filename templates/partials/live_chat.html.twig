@@ -1,0 +1,59 @@
+<!-- Live Chat Widget Placeholder -->
+<div id="live-chat-widget" class="position-fixed bottom-0 end-0 m-3" style="z-index: 1050;">
+    <div class="card shadow-lg" style="width: 350px; display: none;" id="chat-window">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-comments me-2"></i>Live Support</span>
+            <button class="btn btn-sm btn-outline-light" onclick="closeChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="card-body" style="height: 300px; overflow-y: auto;" id="chat-messages">
+            <div class="text-center text-muted py-4">
+                <i class="fas fa-comments fa-2x mb-3"></i>
+                <p>Welcome to our live chat support!</p>
+                <p class="small">This is a placeholder for future live chat implementation.</p>
+                <p class="small">For now, please use our <a href="{{ path('contact') }}">contact form</a> or check our <a href="{{ path('faq') }}">FAQ</a>.</p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Type your message..." disabled>
+                <button class="btn btn-primary" disabled>
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Toggle Button -->
+    <button class="btn btn-primary rounded-circle shadow-lg" style="width: 60px; height: 60px;" onclick="toggleChat()" id="chat-toggle">
+        <i class="fas fa-comments fa-lg"></i>
+    </button>
+</div>
+
+<script>
+function toggleChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const chatToggle = document.getElementById('chat-toggle');
+
+    if (chatWindow.style.display === 'none' || chatWindow.style.display === '') {
+        chatWindow.style.display = 'block';
+        chatToggle.style.display = 'none';
+    }
+}
+
+function closeChat() {
+    const chatWindow = document.getElementById('chat-window');
+    const chatToggle = document.getElementById('chat-toggle');
+
+    chatWindow.style.display = 'none';
+    chatToggle.style.display = 'block';
+}
+
+// Auto-show chat toggle after page load
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+        document.getElementById('chat-toggle').style.display = 'block';
+    }, 2000);
+});
+</script>

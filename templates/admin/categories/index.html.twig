@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Category Management - 2Why Admin{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Category Management -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-4 fw-bold text-primary">Category Management</h1>
+                        <p class="lead text-muted">Manage your product categories</p>
+                    </div>
+                    <a href="{{ path('admin_categories_new') }}" class="btn btn-primary btn-lg">
+                        <span class="me-2">➕</span>Add New Category
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">All Categories ({{ categories|length }})</h5>
+                            <a href="{{ path('admin_categories_new') }}" class="btn btn-primary btn-sm">
+                                <span class="me-1">➕</span>Add New Category
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0">ID</th>
+                                        <th class="border-0">Name</th>
+                                        <th class="border-0">Description</th>
+                                        <th class="border-0">Products Count</th>
+                                        <th class="border-0">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for category in categories %}
+                                    <tr>
+                                        <td class="align-middle">{{ category.id }}</td>
+                                        <td class="align-middle fw-semibold">{{ category.name }}</td>
+                                        <td class="align-middle">{{ category.description ?: 'No description' }}</td>
+                                        <td class="align-middle">
+                                            <span class="badge bg-info">{{ category.products|length }}</span>
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ path('admin_categories_edit', {'id': category.id}) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    ✏️
+                                                </a>
+                                                <form method="post" action="{{ path('admin_categories_delete', {'id': category.id}) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this category? This will affect {{ category.products|length }} products.')">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ category.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-primary">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

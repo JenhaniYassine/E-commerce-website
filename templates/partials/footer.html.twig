@@ -1,0 +1,102 @@
+<!-- Footer -->
+<footer class="footer" role="contentinfo">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5 class="mb-3">2Why</h5>
+                <p>Shop smart, shop 2Why. Your one-stop destination for quality products at great prices.</p>
+                <div class="mt-3" role="list" aria-label="Social media links">
+                    <a href="#" class="social-icon" aria-label="Follow us on Facebook" role="listitem">
+                        <span aria-hidden="true">📘</span>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Follow us on Twitter" role="listitem">
+                        <span aria-hidden="true">🐦</span>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Follow us on Instagram" role="listitem">
+                        <span aria-hidden="true">📷</span>
+                    </a>
+                    <a href="#" class="social-icon" aria-label="Connect with us on LinkedIn" role="listitem">
+                        <span aria-hidden="true">💼</span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h6 class="mb-3">Quick Links</h6>
+                <nav aria-label="Footer quick links">
+                    <ul class="list-unstyled">
+                        <li><a href="{{ path('home') }}" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="{{ path('shop') }}" class="text-white text-decoration-none">Shop</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">About</a></li>
+                        <li><a href="{{ path('contact') }}" class="text-white text-decoration-none">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-lg-2 col-md-4 mb-4">
+                <h6 class="mb-3">Categories</h6>
+                <nav aria-label="Product categories">
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white text-decoration-none">Electronics</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Sports</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Home</a></li>
+                        <li><a href="#" class="text-white text-decoration-none">Fashion</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-lg-4 col-md-4 mb-4">
+                <h6 class="mb-3">Newsletter</h6>
+                <p>Subscribe to get special offers and updates.</p>
+                <form class="newsletter-form" aria-label="Newsletter subscription">
+                    <div class="input-group">
+                        <label for="newsletter-email" class="visually-hidden">Email address for newsletter</label>
+                        <input type="email" class="form-control" id="newsletter-email" placeholder="Your email" aria-describedby="newsletter-help" required>
+                        <button class="btn btn-primary" type="submit" aria-label="Subscribe to newsletter">
+                            <span class="d-none d-sm-inline">Subscribe</span>
+                            <span class="d-sm-none" aria-hidden="true">📧</span>
+                        </button>
+                    </div>
+                    <div id="newsletter-help" class="form-text text-white-50 mt-1">We'll never share your email with anyone else.</div>
+                </form>
+            </div>
+        </div>
+        <hr class="my-4" aria-hidden="true">
+        <div class="row">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2025 2Why. All rights reserved.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <nav aria-label="Legal links">
+                    <a href="#" class="text-white text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-white text-decoration-none">Terms of Service</a>
+                </nav>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+// Newsletter form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const newsletterForm = document.querySelector('.newsletter-form');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('newsletter-email');
+            const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+
+            if (emailInput.value.trim()) {
+                // Show loading state
+                submitBtn.innerHTML = '<span class="spinner me-1"></span><span class="d-none d-sm-inline">Subscribing...</span>';
+                submitBtn.disabled = true;
+
+                // Simulate API call (replace with actual endpoint)
+                setTimeout(() => {
+                    alert('Thank you for subscribing! You\'ll receive our latest updates.');
+                    emailInput.value = '';
+                    submitBtn.innerHTML = '<span class="d-none d-sm-inline">Subscribe</span><span class="d-sm-none">📧</span>';
+                    submitBtn.disabled = false;
+                }, 1000);
+            }
+        });
+    }
+});
+</script>

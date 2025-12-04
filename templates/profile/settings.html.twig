@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Account Settings - {{ parent() }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Profile Sidebar -->
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; font-size: 2rem;">
+                            {{ app.user.firstName|first|upper ~ app.user.lastName|first|upper }}
+                        </div>
+                    </div>
+                    <h5 class="card-title">{{ app.user.firstName }} {{ app.user.lastName }}</h5>
+                    <p class="text-muted">{{ app.user.email }}</p>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{{ path('profile_index') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i>Profile Overview
+                    </a>
+                    <a href="{{ path('profile_orders') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-bag me-2"></i>My Orders
+                    </a>
+                    <a href="{{ path('profile_addresses') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-map-marker-alt me-2"></i>Addresses
+                    </a>
+                    <a href="{{ path('profile_payment_methods') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-credit-card me-2"></i>Payment Methods
+                    </a>
+                    <a href="{{ path('profile_wishlist') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-heart me-2"></i>Wishlist
+                    </a>
+                    <a href="{{ path('profile_settings') }}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-cog me-2"></i>Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- Settings -->
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">Account Settings</h4>
+                </div>
+                <div class="card-body">
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+
+                    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">Password</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mt-4" id="settingsTabsContent">
+                        <!-- Profile Settings -->
+                        <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                            <h5>Update Profile Information</h5>
+                            {{ form_start(profileForm) }}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form_label(profileForm.firstName) }}
+                                        {{ form_widget(profileForm.firstName, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_errors(profileForm.firstName) }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form_label(profileForm.lastName) }}
+                                        {{ form_widget(profileForm.lastName, {'attr': {'class': 'form-control'}}) }}
+                                        {{ form_errors(profileForm.lastName) }}
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form_label(profileForm.email) }}
+                                    {{ form_widget(profileForm.email, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(profileForm.email) }}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form_label(profileForm.phone) }}
+                                    {{ form_widget(profileForm.phone, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(profileForm.phone) }}
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Update Profile
+                                </button>
+                            {{ form_end(profileForm) }}
+                        </div>
+
+                        <!-- Password Settings -->
+                        <div class="tab-pane fade" id="password" role="tabpanel">
+                            <h5>Change Password</h5>
+                            {{ form_start(passwordForm) }}
+                                <div class="mb-3">
+                                    {{ form_label(passwordForm.currentPassword) }}
+                                    {{ form_widget(passwordForm.currentPassword, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(passwordForm.currentPassword) }}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form_label(passwordForm.newPassword.first) }}
+                                    {{ form_widget(passwordForm.newPassword.first, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(passwordForm.newPassword.first) }}
+                                </div>
+
+                                <div class="mb-3">
+                                    {{ form_label(passwordForm.newPassword.second) }}
+                                    {{ form_widget(passwordForm.newPassword.second, {'attr': {'class': 'form-control'}}) }}
+                                    {{ form_errors(passwordForm.newPassword.second) }}
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-key me-2"></i>Change Password
+                                </button>
+                            {{ form_end(passwordForm) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

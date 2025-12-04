@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Order Issue Header -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold mb-4">Report Order Issue</h1>
+                <p class="lead mb-0">Let us know about any issues with your order and we'll help resolve them.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Order Issue Form -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-5">
+                        <h3 class="card-title mb-4">Report an Issue</h3>
+
+                        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+
+                            <div class="mb-3">
+                                {{ form_label(form.order, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.order, {'attr': {'class': 'form-select'}}) }}
+                                {% if form.order.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.order) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.issueType, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.issueType, {'attr': {'class': 'form-select'}}) }}
+                                {% if form.issueType.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.issueType) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+                                {% if form.description.vars.errors|length > 0 %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.description) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Submit Issue Report</button>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

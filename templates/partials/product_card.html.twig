@@ -1,0 +1,116 @@
+<!-- Product Card Component -->
+<div class="col-lg-4 col-md-6 mb-4">
+    <article class="card product-card h-100" role="article" aria-labelledby="product-title-{{ product.id }}">
+        <div class="position-relative overflow-hidden">
+            <!-- Skeleton Loader -->
+            <div class="skeleton-loader"></div>
+            <img src="{{ product.image ?: 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                 class="card-img-top product-image fade-in-image"
+                 alt="Product image for {{ product.name }}"
+                 loading="lazy"
+                 onload="this.classList.add('loaded')">
+            <div class="position-absolute top-0 end-0 p-2">
+                <span class="badge bg-primary" aria-label="Category: {{ product.category.name }}">{{ product.category.name }}</span>
+            </div>
+            <!-- Quick View Overlay -->
+            <div class="quick-view-overlay">
+                <button class="btn quick-view-btn"
+                        onclick="openQuickView({{ product.id }})"
+                        aria-label="Quick view for {{ product.name }}">
+                    Quick View
+                </button>
+            </div>
+            <!-- Slide-in Add to Cart Button -->
+            <div class="add-to-cart-overlay">
+                <button class="btn add-to-cart-overlay-btn"
+                        onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})"
+                        aria-label="Add {{ product.name }} to cart">
+                    Add to Cart
+                </button>
+            </div>
+        </div>
+        <div class="card-body d-flex flex-column">
+            <h5 class="card-title" id="product-title-{{ product.id }}">{{ product.name }}</h5>
+            <p class="card-text text-muted" aria-label="Product category">{{ product.category.name }}</p>
+            {% if product.rating %}
+                <div class="mb-2" aria-label="Product rating: {{ product.rating }} out of 5 stars">
+                    <span class="text-warning" role="img" aria-label="Rating stars">
+                        {% for i in 1..5 %}
+                            {% if i <= product.rating %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <small class="text-muted">({{ product.rating }})</small>
+                </div>
+            {% endif %}
+            <div class="mt-auto">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="h5 text-primary mb-0" aria-label="Price: ${{ product.price }}">${{ product.price }}</span>
+                    <div role="group" aria-label="Product actions">
+                        <a href="{{ path('product_detail', {'id': product.id}) }}"
+                           class="btn btn-outline-primary btn-sm me-1"
+                           aria-label="View details for {{ product.name }}">View Details</a>
+                        <button class="btn btn-primary btn-sm add-to-cart-btn"
+                                onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})"
+                                aria-label="Add {{ product.name }} to cart"
+                                data-product-id="{{ product.id }}"
+                                data-product-name="{{ product.name }}"
+                                data-product-price="{{ product.price }}">
+                            <span class="btn-text">Add to Cart</span>
+                            <span class="spinner d-none"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal-{{ product.id }}" tabindex="-1" aria-labelledby="quickViewModalLabel-{{ product.id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickViewModalLabel-{{ product.id }}">{{ product.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="{{ product.image ?: 'https://via.placeholder.com/300x200?text=No+Image' }}"
+                             class="img-fluid rounded"
+                             alt="Product image for {{ product.name }}">
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Category: {{ product.category.name }}</h6>
+                        {% if product.rating %}
+                            <div class="mb-2">
+                                <span class="text-warning">
+                                    {% for i in 1..5 %}
+                                        {% if i <= product.rating %}
+                                            ★
+                                        {% else %}
+                                            ☆
+                                        {% endif %}
+                                    {% endfor %}
+                                </span>
+                                <small class="text-muted">({{ product.rating }})</small>
+                            </div>
+                        {% endif %}
+                        <p class="text-muted">{{ product.description|slice(0, 150) ~ '...' }}</p>
+                        <h4 class="text-primary">${{ product.price }}</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-outline-primary">View Full Details</a>
+                <button class="btn btn-primary" onclick="addToCart({{ product.id }}, '{{ product.name }}', {{ product.price }})">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+

@@ -1,0 +1,249 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Shop Header -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h1 class="display-4 fw-bold text-primary">Shop</h1>
+                <p class="lead text-muted">Discover our complete collection of products</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Shop Content -->
+<section class="py-5">
+    <div class="container">
+        <!-- Filters and Sort -->
+        <div class="row mb-4">
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Filters</h5>
+
+                        <!-- Category Filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if currentFilters['category'] is defined and currentFilters.category == category.id %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div class="mb-3">
+                            <label class="form-label">Price Range</label>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input type="number" class="form-control" id="minPrice" placeholder="Min" value="{{ currentFilters['minPrice'] is defined ? currentFilters.minPrice : '' }}" step="0.01">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control" id="maxPrice" placeholder="Max" value="{{ currentFilters['maxPrice'] is defined ? currentFilters.maxPrice : '' }}" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary w-100" onclick="applyFilters()">Apply Filters</button>
+                        <button class="btn btn-outline-secondary w-100 mt-2" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <p class="mb-0">Showing {{ products|length }} of {{ totalProducts }} products</p>
+                    <select class="form-select w-auto" id="sortSelect">
+                        <option value="name_ASC" {% if currentSort == 'name' and currentOrder == 'ASC' %}selected{% endif %}>Sort by: Name A-Z</option>
+                        <option value="name_DESC" {% if currentSort == 'name' and currentOrder == 'DESC' %}selected{% endif %}>Sort by: Name Z-A</option>
+                        <option value="price_ASC" {% if currentSort == 'price' and currentOrder == 'ASC' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_DESC" {% if currentSort == 'price' and currentOrder == 'DESC' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="popularity_DESC" {% if currentSort == 'popularity' and currentOrder == 'DESC' %}selected{% endif %}>Popularity</option>
+                        <option value="rating_DESC" {% if currentSort == 'rating' and currentOrder == 'DESC' %}selected{% endif %}>Best Rated</option>
+                        <option value="newest_DESC" {% if currentSort == 'newest' %}selected{% endif %}>Newest</option>
+                    </select>
+                </div>
+
+                <!-- Products Grid -->
+                <div class="row">
+                    {% for product in products %}
+                        {% include 'partials/product_card.html.twig' with {'product': product} only %}
+                    {% endfor %}
+                </div>
+
+                {% if products|length == 0 %}
+                    <div class="text-center py-5">
+                        <h4>No products found</h4>
+                        <p>Try adjusting your filters or search criteria.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Pagination -->
+                {% if totalPages > 1 %}
+                    <nav aria-label="Product pagination" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item {% if currentPage == 1 %}disabled{% endif %}">
+                                <a class="page-link" href="{{ path('shop', app.request.query.all|merge({'page': currentPage - 1})) }}" tabindex="-1">Previous</a>
+                            </li>
+                            {% for pageNum in 1..totalPages %}
+                                {% if pageNum >= currentPage - 2 and pageNum <= currentPage + 2 %}
+                                    <li class="page-item {% if pageNum == currentPage %}active{% endif %}">
+                                        <a class="page-link" href="{{ path('shop', app.request.query.all|merge({'page': pageNum})) }}">{{ pageNum }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="page-item {% if currentPage == totalPages %}disabled{% endif %}">
+                                <a class="page-link" href="{{ path('shop', app.request.query.all|merge({'page': currentPage + 1})) }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Pass CSRF token from Twig to JS
+const cartAddCsrfToken = '{{ csrf_token('cart_add') }}';
+
+function applyFilters() {
+    const category = document.getElementById('categoryFilter').value;
+    const minPrice = document.getElementById('minPrice').value;
+    const maxPrice = document.getElementById('maxPrice').value;
+    const sortValue = document.getElementById('sortSelect').value;
+    const [sort, order] = sortValue.split('_');
+
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', '1'); // Reset to first page when filtering
+
+    if (category) params.set('category', category); else params.delete('category');
+    if (minPrice) params.set('min_price', minPrice); else params.delete('min_price');
+    if (maxPrice) params.set('max_price', maxPrice); else params.delete('max_price');
+    params.set('sort', sort);
+    params.set('order', order);
+
+    window.location.href = window.location.pathname + '?' + params.toString();
+}
+
+function clearFilters() {
+    window.location.href = window.location.pathname;
+}
+
+function addToCart(id, name, price) {
+    const button = document.querySelector(`[data-product-id="${id}"]`);
+    if (!button) {
+        console.error('Button not found for product:', id);
+        return;
+    }
+
+    const btnText = button.querySelector('.btn-text');
+    const spinner = button.querySelector('.spinner');
+    const originalText = btnText.textContent;
+
+    // Show loading state
+    button.classList.add('loading');
+    button.disabled = true;
+    btnText.textContent = 'Adding...';
+    spinner.classList.remove('d-none');
+
+    // Create form data
+    const formData = new FormData();
+    formData.append('quantity', 1);
+    formData.append('_token', cartAddCsrfToken);
+
+    // Send AJAX request
+    fetch('{{ path('cart_add', {'id': 'PLACEHOLDER'}) }}'.replace('PLACEHOLDER', id), {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Success animation
+            button.classList.remove('loading');
+            button.classList.add('bounce');
+            btnText.textContent = 'Added!';
+            spinner.classList.add('d-none');
+
+            // Update cart badge with animation
+            updateCartCount();
+
+            // Reset button after animation
+            setTimeout(() => {
+                button.classList.remove('bounce');
+                btnText.textContent = originalText;
+                button.disabled = false;
+            }, 2000);
+        } else {
+            // Error state
+            button.classList.remove('loading');
+            btnText.textContent = 'Error';
+            spinner.classList.add('d-none');
+            console.error('Cart error:', data.message);
+
+            setTimeout(() => {
+                btnText.textContent = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Error state
+        button.classList.remove('loading');
+        btnText.textContent = 'Error';
+        spinner.classList.add('d-none');
+
+        setTimeout(() => {
+            btnText.textContent = originalText;
+            button.disabled = false;
+        }, 2000);
+    });
+}
+
+function updateCartCount() {
+    fetch('{{ path('cart_count') }}')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.getElementById('cart-count');
+            if (badge) {
+                const currentCount = parseInt(badge.textContent) || 0;
+                const newCount = data.count;
+
+                if (newCount !== currentCount) {
+                    badge.classList.add('bounce');
+                    badge.textContent = newCount;
+
+                    setTimeout(() => {
+                        badge.classList.remove('bounce');
+                    }, 1000);
+                }
+            }
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+function openQuickView(productId) {
+    const modal = new bootstrap.Modal(document.getElementById('quickViewModal-' + productId));
+    modal.show();
+}
+
+document.getElementById('sortSelect').addEventListener('change', function() {
+    applyFilters();
+});
+</script>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

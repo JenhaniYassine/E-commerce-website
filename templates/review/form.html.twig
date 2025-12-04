@@ -1,0 +1,149 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Write a Review - {{ product.name }}{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Review Form Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-star me-2"></i>
+                            Write a Review for {{ product.name }}
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Product Info -->
+                        <div class="product-info mb-4 p-3 bg-light rounded">
+                            <div class="row align-items-center">
+                                <div class="col-md-3">
+                                    {% if product.image %}
+                                        <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" class="img-fluid rounded">
+                                    {% else %}
+                                        <div class="bg-secondary d-flex align-items-center justify-content-center rounded" style="height: 80px;">
+                                            <span class="text-white">No Image</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-9">
+                                    <h5 class="mb-1">{{ product.name }}</h5>
+                                    <p class="text-muted mb-1">{{ product.description|slice(0, 100) }}{% if product.description|length > 100 %}...{% endif %}</p>
+                                    <span class="badge bg-success">${{ product.price }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Review Form -->
+                        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                            <!-- Rating Field -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">{{ form_label(form.rating) }}</label>
+                                <div class="rating-stars">
+                                    {{ form_widget(form.rating) }}
+                                </div>
+                                {% if form.rating.vars.errors|length > 0 %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form_errors(form.rating) }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Comment Field -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">{{ form_label(form.comment) }}</label>
+                                {{ form_widget(form.comment, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                                {% if form.comment.vars.errors|length > 0 %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form_errors(form.comment) }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">
+                                    Minimum 10 characters, maximum 1000 characters.
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>
+                                    {% if review is defined %}Update Review{% else %}Submit Review{% endif %}
+                                </button>
+                                <a href="{{ path('product_detail', {'id': product.id}) }}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+
+<style>
+.rating-stars .form-check {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.rating-stars .form-check-input {
+    display: none;
+}
+
+.rating-stars .form-check-label {
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.rating-stars .form-check-input:checked ~ .form-check-label,
+.rating-stars .form-check-input:checked + .form-check-label {
+    color: #ffc107;
+}
+
+.rating-stars .form-check-label:hover,
+.rating-stars .form-check-label:hover ~ .form-check-label {
+    color: #ffc107;
+}
+</style>
+
+<script>
+// Rating stars interactivity
+document.addEventListener('DOMContentLoaded', function() {
+    const ratingInputs = document.querySelectorAll('input[name="review[rating]"]');
+
+    ratingInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            const value = this.value;
+            const labels = document.querySelectorAll('.rating-stars .form-check-label');
+
+            labels.forEach((label, index) => {
+                if (index < value) {
+                    label.style.color = '#ffc107';
+                } else {
+                    label.style.color = '#ddd';
+                }
+            });
+        });
+    });
+
+    // Set initial state
+    const checkedInput = document.querySelector('input[name="review[rating]"]:checked');
+    if (checkedInput) {
+        checkedInput.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+{% endblock %}

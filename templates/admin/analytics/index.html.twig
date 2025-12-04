@@ -1,0 +1,417 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Analytics - 2Why{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --bg-color: #ffffff;
+        --text-color: #333333;
+        --card-bg: #f8f9fa;
+        --border-color: #dee2e6;
+    }
+
+    [data-theme="dark"] {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --card-bg: #2d2d2d;
+        --border-color: #495057;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .table {
+        color: var(--text-color);
+    }
+
+    .table thead th {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .table tbody td {
+        border-color: var(--border-color);
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--card-bg);
+        border-right: 1px solid var(--border-color);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+        transform: translateX(-250px);
+    }
+
+    .main-content {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-250px);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="p-3">
+            <h5 class="text-center mb-4">Admin Panel</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_dashboard') }}">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link active" href="{{ path('admin_analytics') }}">
+                        <i class="bi bi-graph-up"></i> Analytics
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_products') }}">
+                        <i class="bi bi-box-seam"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_orders') }}">
+                        <i class="bi bi-receipt"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_users') }}">
+                        <i class="bi bi-people"></i> Users
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_reviews') }}">
+                        <i class="bi bi-star"></i> Reviews
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_support') }}">
+                        <i class="bi bi-headset"></i> Support
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_settings') }}">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+                <span>Theme</span>
+                <button class="btn btn-sm btn-outline-secondary" id="theme-toggle">
+                    <i class="bi bi-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1" id="main-content">
+        <!-- Sidebar Toggle -->
+        <button class="btn btn-light sidebar-toggle d-md-none" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <div class="container-fluid p-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h3 mb-0">Analytics Dashboard</h1>
+                    <p class="text-muted">Monitor your store's performance</p>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Total Revenue</h6>
+                                    <h4 class="mb-0 text-success">${{ analytics.total_revenue|number_format(2) }}</h4>
+                                </div>
+                                <div class="text-success">
+                                    <i class="bi bi-currency-dollar fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Orders</h6>
+                                    <h4 class="mb-0 text-primary">{{ analytics.total_orders }}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="bi bi-receipt fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Conversion Rate</h6>
+                                    <h4 class="mb-0 text-info">{{ analytics.conversion_rate }}%</h4>
+                                </div>
+                                <div class="text-info">
+                                    <i class="bi bi-graph-up fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Avg Order Value</h6>
+                                    <h4 class="mb-0 text-warning">${{ analytics.avg_order_value|number_format(2) }}</h4>
+                                </div>
+                                <div class="text-warning">
+                                    <i class="bi bi-calculator fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Monthly Sales</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="salesChart" width="400" height="200" data-labels="{{ analytics.sales_labels|json_encode }}" data-data="{{ analytics.sales_data|json_encode }}"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Top Products</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="productsChart" width="200" height="200" data-labels="{{ analytics.products_labels|json_encode }}" data-data="{{ analytics.products_data|json_encode }}"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tables Row -->
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Recent Orders</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in analytics.recent_orders %}
+                                        <tr>
+                                            <td>#{{ order.id }}</td>
+                                            <td>{{ order.user.email }}</td>
+                                            <td>${{ order.total|number_format(2) }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ order.status == 'completed' ? 'success' : (order.status == 'pending' ? 'warning' : 'secondary') }}">
+                                                    {{ order.status|title }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Top Selling Products</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Sold</th>
+                                            <th>Revenue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for product in analytics.top_products %}
+                                        <tr>
+                                            <td>{{ product.name }}</td>
+                                            <td>{{ product.quantity }}</td>
+                                            <td>${{ product.revenue|number_format(2) }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', newTheme);
+        themeToggle.innerHTML = newTheme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', savedTheme);
+    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+
+    // Charts
+    const salesCtx = document.getElementById('salesChart').getContext('2d');
+    const productsCtx = document.getElementById('productsChart').getContext('2d');
+
+    // Sales Chart
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: {{ analytics.sales_labels|json_encode|raw }},
+            datasets: [{
+                label: 'Monthly Sales',
+                data: {{ analytics.sales_data|json_encode|raw }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Monthly Sales Overview'
+                }
+            }
+        }
+    });
+
+    // Top Products Chart
+    new Chart(productsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ analytics.products_labels|json_encode|raw }},
+            datasets: [{
+                data: {{ analytics.products_data|json_encode|raw }},
+                backgroundColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)',
+                    'rgb(255, 205, 86)',
+                    'rgb(75, 192, 192)',
+                    'rgb(153, 102, 255)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

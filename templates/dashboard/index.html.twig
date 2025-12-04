@@ -1,0 +1,444 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<!-- Animated Background -->
+<div class="dashboard-bg">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+    <div class="floating-shape shape-4"></div>
+    <div class="floating-shape shape-5"></div>
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+</div>
+
+<!-- Dashboard Layout -->
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <aside class="dashboard-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <span class="logo-icon">📊</span>
+                <span class="logo-text">Dashboard</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#overview" class="nav-item active" data-section="overview">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Overview</span>
+            </a>
+            <a href="#analytics" class="nav-item" data-section="analytics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-text">Analytics</span>
+            </a>
+            <a href="#users" class="nav-item" data-section="users">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Users</span>
+            </a>
+            <a href="#settings" class="nav-item" data-section="settings">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <span>{{ app.user.firstName|slice(0, 1)|upper }}</span>
+                </div>
+                <div class="user-details">
+                    <div class="user-name">{{ app.user.firstName }}</div>
+                    <div class="user-role">Premium User</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="welcome-title">Welcome back, {{ app.user.firstName }}!</h1>
+                    <p class="welcome-subtitle">Here's what's happening with your account today</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-actions">
+                        <button class="btn-action btn-primary">
+                            <span class="btn-icon">➕</span>
+                            Quick Action
+                        </button>
+                        <div class="notification-bell">
+                            <span class="bell-icon">🔔</span>
+                            <span class="notification-badge">3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Content Sections -->
+        <div class="dashboard-content">
+            <!-- Overview Section -->
+            <section id="overview" class="content-section active">
+                <!-- Quick Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-content">
+                            <div class="stat-number">{{ user.orders|length }}</div>
+                            <div class="stat-label">Total Orders</div>
+                        </div>
+                        <a href="{{ path('profile_orders') }}" class="stat-action">View Orders</a>
+                    </div>
+
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-icon">❤️</div>
+                        <div class="stat-content">
+                            <div class="stat-number">{{ user.wishlists|length }}</div>
+                            <div class="stat-label">Wishlist Items</div>
+                        </div>
+                        <a href="{{ path('profile_wishlist') }}" class="stat-action">View Wishlist</a>
+                    </div>
+
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-icon">📍</div>
+                        <div class="stat-content">
+                            <div class="stat-number">{{ user.addresses|length }}</div>
+                            <div class="stat-label">Saved Addresses</div>
+                        </div>
+                        <a href="{{ path('profile_addresses') }}" class="stat-action">Manage</a>
+                    </div>
+
+                    <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                        <div class="stat-icon">💳</div>
+                        <div class="stat-content">
+                            <div class="stat-number">{{ user.paymentMethods|length }}</div>
+                            <div class="stat-label">Payment Methods</div>
+                        </div>
+                        <a href="{{ path('profile_payment_methods') }}" class="stat-action">Manage</a>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="row">
+                        <div class="col-lg-8 mb-4">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <h3>Sales Overview</h3>
+                                    <div class="chart-controls">
+                                        <button class="chart-btn active" data-period="7d">7D</button>
+                                        <button class="chart-btn" data-period="30d">30D</button>
+                                        <button class="chart-btn" data-period="90d">90D</button>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="salesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 mb-4">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <h3>Order Status</h3>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="statusChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="activity-section">
+                    <div class="section-header">
+                        <h2>Recent Activity</h2>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+
+                    <div class="activity-grid">
+                        <div class="activity-card">
+                            <div class="activity-icon">🛒</div>
+                            <div class="activity-content">
+                                <div class="activity-title">New Order Placed</div>
+                                <div class="activity-meta">Order #12345 • 2 hours ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-card">
+                            <div class="activity-icon">⭐</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Review Submitted</div>
+                                <div class="activity-meta">Product: Wireless Headphones • 1 day ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-card">
+                            <div class="activity-icon">📍</div>
+                            <div class="activity-content">
+                                <div class="activity-title">Address Updated</div>
+                                <div class="activity-meta">Home address modified • 3 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="actions-section">
+                    <div class="section-header">
+                        <h2>Quick Actions</h2>
+                    </div>
+
+                    <div class="actions-grid">
+                        <a href="{{ path('profile_settings') }}" class="action-card">
+                            <div class="action-icon">⚙️</div>
+                            <div class="action-content">
+                                <div class="action-title">Account Settings</div>
+                                <div class="action-desc">Update your profile and preferences</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ path('profile_addresses') }}" class="action-card">
+                            <div class="action-icon">📍</div>
+                            <div class="action-content">
+                                <div class="action-title">Manage Addresses</div>
+                                <div class="action-desc">Add or edit delivery addresses</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ path('profile_payment_methods') }}" class="action-card">
+                            <div class="action-icon">💳</div>
+                            <div class="action-content">
+                                <div class="action-title">Payment Methods</div>
+                                <div class="action-desc">Manage your saved payment options</div>
+                            </div>
+                        </a>
+
+                        <a href="{{ path('profile_reviews') }}" class="action-card">
+                            <div class="action-icon">⭐</div>
+                            <div class="action-content">
+                                <div class="action-title">My Reviews</div>
+                                <div class="action-desc">View and manage your product reviews</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="content-section">
+                <div class="analytics-content">
+                    <h2>Analytics Dashboard</h2>
+
+                    <!-- Analytics Overview Cards -->
+                    <div class="analytics-overview">
+                        <div class="analytics-card">
+                            <div class="analytics-icon">📊</div>
+                            <div class="analytics-content">
+                                <div class="analytics-number">{{ analytics.orderStats.totalOrders ?? 0 }}</div>
+                                <div class="analytics-label">Total Orders</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-icon">💰</div>
+                            <div class="analytics-content">
+                                <div class="analytics-number">${{ analytics.orderStats.totalSpent ? analytics.orderStats.totalSpent|number_format(2) : '0.00' }}</div>
+                                <div class="analytics-label">Total Spent</div>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-icon">📈</div>
+                            <div class="analytics-content">
+                                <div class="analytics-number">${{ analytics.orderStats.avgOrderValue ? analytics.orderStats.avgOrderValue|number_format(2) : '0.00' }}</div>
+                                <div class="analytics-label">Avg Order Value</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spending Trends Chart -->
+                    <div class="analytics-chart">
+                        <h3>Monthly Spending Trends</h3>
+                        <canvas id="spendingChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Category Preferences -->
+                    <div class="analytics-chart">
+                        <h3>Category Preferences</h3>
+                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Top Products -->
+                    <div class="analytics-products">
+                        <h3>Top Purchased Products</h3>
+                        <div class="products-list">
+                            {% for product in analytics.topProducts %}
+                            <div class="product-item">
+                                <div class="product-name">{{ product.name }}</div>
+                                <div class="product-stats">
+                                    <span class="quantity">{{ product.totalQuantity }} purchased</span>
+                                    <span class="orders">{{ product.orderCount }} orders</span>
+                                    <span class="price">${{ product.price|number_format(2) }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Order Frequency -->
+                    <div class="analytics-chart">
+                        <h3>Order Frequency (Last 30 Days)</h3>
+                        <canvas id="frequencyChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="users" class="content-section">
+                <div class="users-content">
+                    <h2>User Management</h2>
+                    <p>User management features coming soon...</p>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="content-section">
+                <div class="settings-content">
+                    <h2>Settings</h2>
+                    <p>Settings panel coming soon...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+
+<!-- Analytics Charts JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Analytics data from PHP
+    const analyticsData = {{ analytics|json_encode|raw }};
+
+    // Spending Trends Chart
+    if (document.getElementById('spendingChart')) {
+        const spendingCtx = document.getElementById('spendingChart').getContext('2d');
+        const spendingLabels = analyticsData.monthlySpending ? analyticsData.monthlySpending.map(item => `${item.year}-${item.month.toString().padStart(2, '0')}`) : [];
+        const spendingData = analyticsData.monthlySpending ? analyticsData.monthlySpending.map(item => parseFloat(item.total)) : [];
+
+        new Chart(spendingCtx, {
+            type: 'line',
+            data: {
+                labels: spendingLabels,
+                datasets: [{
+                    label: 'Monthly Spending ($)',
+                    data: spendingData,
+                    borderColor: '#3498db',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Category Preferences Chart
+    if (document.getElementById('categoryChart')) {
+        const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+        const categoryLabels = analyticsData.categoryPreferences ? analyticsData.categoryPreferences.map(item => item.categoryName) : [];
+        const categoryData = analyticsData.categoryPreferences ? analyticsData.categoryPreferences.map(item => parseInt(item.totalQuantity)) : [];
+
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryData,
+                    backgroundColor: [
+                        '#3498db',
+                        '#e74c3c',
+                        '#2ecc71',
+                        '#f39c12',
+                        '#9b59b6',
+                        '#1abc9c',
+                        '#34495e'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
+
+    // Order Frequency Chart
+    if (document.getElementById('frequencyChart')) {
+        const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+        const frequencyLabels = analyticsData.orderFrequency ? analyticsData.orderFrequency.map(item => item.orderDate) : [];
+        const frequencyData = analyticsData.orderFrequency ? analyticsData.orderFrequency.map(item => parseInt(item.orderCount)) : [];
+
+        new Chart(frequencyCtx, {
+            type: 'bar',
+            data: {
+                labels: frequencyLabels,
+                datasets: [{
+                    label: 'Orders per Day',
+                    data: frequencyData,
+                    backgroundColor: '#27ae60',
+                    borderColor: '#229954',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

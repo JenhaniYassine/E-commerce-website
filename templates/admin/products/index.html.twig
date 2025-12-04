@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product Management - 2Why Admin{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Product Management -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-4 fw-bold text-primary">Product Management</h1>
+                        <p class="lead text-muted">Manage your product catalog</p>
+                    </div>
+                    <a href="{{ path('admin_products_new') }}" class="btn btn-primary btn-lg">
+                        <span class="me-2">➕</span>Add New Product
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">All Products ({{ products|length }})</h5>
+                            <a href="{{ path('admin_products_new') }}" class="btn btn-primary btn-sm">
+                                <span class="me-1">➕</span>Add New Product
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="border-0">ID</th>
+                                        <th class="border-0">Image</th>
+                                        <th class="border-0">Name</th>
+                                        <th class="border-0">Category</th>
+                                        <th class="border-0">Price</th>
+                                        <th class="border-0">Stock</th>
+                                        <th class="border-0">Status</th>
+                                        <th class="border-0">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for product in products %}
+                                    <tr>
+                                        <td class="align-middle">{{ product.id }}</td>
+                                        <td class="align-middle">
+                                            {% if product.image %}
+                                                <img src="{{ asset('uploads/images/' ~ product.image) }}" alt="{{ product.name }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                                    <span class="text-muted">No Image</span>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td class="align-middle fw-semibold">{{ product.name }}</td>
+                                        <td class="align-middle">
+                                            <span class="badge bg-secondary">{{ product.category.name }}</span>
+                                        </td>
+                                        <td class="align-middle fw-bold text-primary">${{ product.price }}</td>
+                                        <td class="align-middle">{{ product.stockQuantity }}</td>
+                                        <td class="align-middle">
+                                            {% if product.status %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-warning">Hidden</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="align-middle">
+                                            <div class="btn-group" role="group">
+                                                <a href="{{ path('admin_products_edit', {'id': product.id}) }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    ✏️
+                                                </a>
+                                                <form method="post" action="{{ path('admin_products_toggle', {'id': product.id}) }}" style="display: inline;">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ product.id) }}">
+                                                    <button type="submit" class="btn btn-sm {% if product.status %}btn-outline-warning{% else %}btn-outline-success{% endif %}" title="{% if product.status %}Hide{% else %}Show{% endif %}">
+                                                        {% if product.status %}👁️{% else %}🙈{% endif %}
+                                                    </button>
+                                                </form>
+                                                <form method="post" action="{{ path('admin_products_delete', {'id': product.id}) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this product?')">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ product.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- Back to Dashboard -->
+        <div class="row mt-4">
+            <div class="col-12 text-center">
+                <a href="{{ path('admin_dashboard') }}" class="btn btn-outline-primary">
+                    ← Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

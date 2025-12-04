@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Details - 2Why{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- User Details -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h1 class="display-4 fw-bold text-primary">User #{{ user.id }}</h1>
+                <p class="lead text-muted">User details and management</p>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+
+        <!-- User Info -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">User Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>User ID:</strong> #{{ user.id }}</p>
+                        <p><strong>Email:</strong> {{ user.email }}</p>
+                        <p><strong>Status:</strong>
+                            {% if user.banned %}
+                            <span class="badge bg-danger">Banned</span>
+                            {% else %}
+                            <span class="badge bg-success">Active</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Verified:</strong>
+                            {% if user.isVerified %}
+                            <span class="badge bg-success">Yes</span>
+                            {% else %}
+                            <span class="badge bg-warning">No</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Roles:</strong> {{ user.roles|join(', ') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Order Statistics</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Total Orders:</strong> {{ user.orders|length }}</p>
+                        <p><strong>Pending Orders:</strong> {{ user.orders|filter(order => order.status == 'Pending')|length }}</p>
+                        <p><strong>Completed Orders:</strong> {{ user.orders|filter(order => order.status == 'Delivered')|length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Orders -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Recent Orders</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if user.orders is empty %}
+                        <p class="text-center text-muted">No orders found.</p>
+                        {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Status</th>
+                                        <th>Total</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in user.orders|slice(0, 10) %}
+                                    <tr>
+                                        <td>#{{ order.id }}</td>
+                                        <td>
+                                            <span class="badge
+                                                {% if order.status == 'Pending' %}bg-warning
+                                                {% elseif order.status == 'Confirmed' %}bg-info
+                                                {% elseif order.status == 'Shipped' %}bg-secondary
+                                                {% elseif order.status == 'Delivered' %}bg-success
+                                                {% elseif order.status == 'Cancelled' %}bg-danger
+                                                {% endif %}">
+                                                {{ order.status }}
+                                            </span>
+                                        </td>
+                                        <td>${{ order.total }}</td>
+                                        <td>{{ order.createdAt|date('Y-m-d H:i') }}</td>
+                                        <td>
+                                            <a href="{{ path('admin_orders_show', {'id': order.id}) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                            {% if user.banned %}
+                            <form method="post" action="{{ path('admin_users_unban', {'id': user.id}) }}" class="me-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
+                                <button type="submit" class="btn btn-success">Unban User</button>
+                            </form>
+                            {% else %}
+                            <form method="post" action="{{ path('admin_users_ban', {'id': user.id}) }}" class="me-2">
+                                <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
+                                <button type="submit" class="btn btn-danger">Ban User</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <a href="{{ path('admin_users') }}" class="btn btn-secondary">Back to Users</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}

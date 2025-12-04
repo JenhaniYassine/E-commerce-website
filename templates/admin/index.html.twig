@@ -1,0 +1,488 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Admin Dashboard - 2Why{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --bg-color: #ffffff;
+        --text-color: #333333;
+        --card-bg: #f8f9fa;
+        --border-color: #dee2e6;
+    }
+
+    [data-theme="dark"] {
+        --bg-color: #1a1a1a;
+        --text-color: #ffffff;
+        --card-bg: #2d2d2d;
+        --border-color: #495057;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .card {
+        background-color: var(--card-bg);
+        border-color: var(--border-color);
+        color: var(--text-color);
+    }
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 250px;
+        background-color: var(--card-bg);
+        border-right: 1px solid var(--border-color);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+        transform: translateX(-250px);
+    }
+
+    .main-content {
+        margin-left: 250px;
+        transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+        margin-left: 0;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        z-index: 1001;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-250px);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="d-flex">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="p-3">
+            {% if settings and settings.logo %}
+                <div class="text-center mb-3">
+                    <img src="{{ asset(settings.logo) }}" alt="Logo" class="img-fluid" style="max-height: 60px;">
+                </div>
+            {% endif %}
+            <h5 class="text-center mb-4">Admin Panel</h5>
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link active" href="{{ path('admin_dashboard') }}">
+                        <i class="bi bi-house-door"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_analytics') }}">
+                        <i class="bi bi-graph-up"></i> Analytics
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_products') }}">
+                        <i class="bi bi-box-seam"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_orders') }}">
+                        <i class="bi bi-receipt"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_users') }}">
+                        <i class="bi bi-people"></i> Users
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_reviews') }}">
+                        <i class="bi bi-star"></i> Reviews
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_support') }}">
+                        <i class="bi bi-headset"></i> Support
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{{ path('admin_settings') }}">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+                <span>Theme</span>
+                <button class="btn btn-sm btn-outline-secondary" id="theme-toggle">
+                    <i class="bi bi-moon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content flex-grow-1" id="main-content">
+        <!-- Sidebar Toggle -->
+        <button class="btn btn-light sidebar-toggle d-md-none" id="sidebar-toggle">
+            <i class="bi bi-list"></i>
+        </button>
+
+        <div class="container-fluid p-4">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h1 class="h3 mb-0">Dashboard Overview</h1>
+                    <p class="text-muted">Welcome back! Here's what's happening with your store.</p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Total Products</h6>
+                                    <h4 class="mb-0 text-primary">{{ stats.total_products }}</h4>
+                                </div>
+                                <div class="text-primary">
+                                    <i class="bi bi-box-seam fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Total Orders</h6>
+                                    <h4 class="mb-0 text-success">{{ stats.total_orders }}</h4>
+                                </div>
+                                <div class="text-success">
+                                    <i class="bi bi-receipt fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Pending Orders</h6>
+                                    <h4 class="mb-0 text-warning">{{ stats.pending_orders }}</h4>
+                                </div>
+                                <div class="text-warning">
+                                    <i class="bi bi-clock fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title mb-1">Total Users</h6>
+                                    <h4 class="mb-0 text-info">{{ stats.total_users }}</h4>
+                                </div>
+                                <div class="text-info">
+                                    <i class="bi bi-people fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Recent Activities</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                {% for product in recent_products %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>Product Added:</strong> {{ product.name }}
+                                            <small class="text-muted">({{ product.category.name }})</small>
+                                        </div>
+                                        <small class="text-muted">ID: {{ product.id }}</small>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% if recent_products is empty %}
+                                <li class="list-group-item text-center text-muted">No recent activities</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Management Sections -->
+            <div class="row">
+                <!-- Products Management -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Products Management</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('admin_products_new') }}" class="btn btn-outline-primary">
+                                    <i class="bi bi-plus-circle"></i> Add Product
+                                </a>
+                                <a href="#products-section" class="btn btn-outline-secondary" onclick="showSection('products')">
+                                    <i class="bi bi-box-seam"></i> Manage Products
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders Management -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Orders Management</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="#orders-section" class="btn btn-outline-success" onclick="showSection('orders')">
+                                    <i class="bi bi-receipt"></i> View Orders
+                                </a>
+                                <a href="{{ path('admin_analytics') }}" class="btn btn-outline-warning">
+                                    <i class="bi bi-graph-up"></i> View Analytics
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Management -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Users Management</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="#users-section" class="btn btn-outline-info" onclick="showSection('users')">
+                                    <i class="bi bi-people"></i> Manage Users
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <div id="products-section" class="section-content" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Name</th>
+                                                <th>Price</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for product in products %}
+                                            <tr>
+                                                <td>{{ product.id }}</td>
+                                                <td>{{ product.name }}</td>
+                                                <td>${{ product.price|number_format(2) }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ product.status ? 'success' : 'secondary' }}">
+                                                        {{ product.status ? 'Active' : 'Inactive' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <a href="{{ path('admin_products_edit', {'id': product.id}) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                                    <form method="post" action="{{ path('admin_products_toggle', {'id': product.id}) }}" class="d-inline">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ product.id) }}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-warning">{{ product.status ? 'Deactivate' : 'Activate' }}</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Section -->
+            <div id="orders-section" class="section-content" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Customer</th>
+                                                <th>Total</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in orders %}
+                                            <tr>
+                                                <td>#{{ order.id }}</td>
+                                                <td>{{ order.user.email }}</td>
+                                                <td>${{ order.total|number_format(2) }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ order.status == 'completed' ? 'success' : (order.status == 'pending' ? 'warning' : 'secondary') }}">
+                                                        {{ order.status|title }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ order.createdAt|date('M d, Y') }}</td>
+                                                <td>
+                                                    <a href="{{ path('admin_orders_show', {'id': order.id}) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users-section" class="section-content" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Email</th>
+                                                <th>Status</th>
+                                                <th>Joined</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in users %}
+                                            <tr>
+                                                <td>{{ user.id }}</td>
+                                                <td>{{ user.email }}</td>
+                                                <td>
+                                                    <span class="badge bg-{{ user.banned ? 'danger' : 'success' }}">
+                                                        {{ user.banned ? 'Banned' : 'Active' }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ user.createdAt|date('M d, Y') }}</td>
+                                                <td>
+                                                    <a href="{{ path('admin_users_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                                    {% if not user.banned %}
+                                                        <form method="post" action="{{ path('admin_users_ban', {'id': user.id}) }}" class="d-inline">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Ban</button>
+                                                        </form>
+                                                    {% else %}
+                                                        <form method="post" action="{{ path('admin_users_unban', {'id': user.id}) }}" class="d-inline">
+                                                            <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
+                                                            <button type="submit" class="btn btn-sm btn-outline-success">Unban</button>
+                                                        </form>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+    // Sidebar toggle
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+
+    sidebarToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('expanded');
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const body = document.body;
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        body.setAttribute('data-theme', newTheme);
+        themeToggle.innerHTML = newTheme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    body.setAttribute('data-theme', savedTheme);
+    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="bi bi-sun"></i>' : '<i class="bi bi-moon"></i>';
+</script>
+{% endblock %}
+{% endblock %}

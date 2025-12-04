@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Users Management - 2Why{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+{% include 'partials/navbar.html.twig' %}
+
+<!-- Users Management -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <h1 class="display-4 fw-bold text-primary">Users Management</h1>
+                <p class="lead text-muted">View and manage all users</p>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <form method="get" action="{{ path('admin_users') }}" class="d-flex">
+                            <input type="text" name="search" class="form-control me-2" placeholder="Search by email..." value="{{ search }}">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            {% if search %}
+                            <a href="{{ path('admin_users') }}" class="btn btn-secondary ms-2">Clear</a>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Users</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if users is empty %}
+                        <p class="text-center text-muted">No users found.</p>
+                        {% else %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Verified</th>
+                                        <th>Orders</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.banned %}
+                                            <span class="badge bg-danger">Banned</span>
+                                            {% else %}
+                                            <span class="badge bg-success">Active</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user.isVerified %}
+                                            <span class="badge bg-success">Yes</span>
+                                            {% else %}
+                                            <span class="badge bg-warning">No</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ user.orders|length }}</td>
+                                        <td>
+                                            <a href="{{ path('admin_users_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+{% include 'partials/footer.html.twig' %}
+{% endblock %}
